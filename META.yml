@@ -15,9 +15,9 @@ name: Alien-ElasticSearch
 provides:
   Alien::ElasticSearch:
     file: lib/Alien/ElasticSearch.pm
-    version: 0.01
+    version: 0.02
 requires:
   Archive::Extract: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.01
+version: 0.02

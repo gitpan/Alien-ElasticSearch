@@ -1,6 +1,7 @@
 package MY::Build;
 our @ISA = 'Module::Build';
 use Module::Build;
+use File::Spec::Functions qw(splitdir catpath);
 
 use lib qw(lib inc);
 
@@ -10,12 +11,19 @@ sub ACTION_build {
     require File::Temp;
     Alien::ElasticSearch->check_for_git;
     Alien::ElasticSearch->check_for_java;
+
     my $temp_dir;
+    my $dir;
+    if ($dir = Alien::ElasticSearch->install_dir) {
+        my @parts = splitdir($dir);
+        pop @parts;
+        $dir = catpath(@parts);
+    }
 
-    print "Enter the path to the parent folder where you would like to \n"
-        . "install ElasticSearch or leave it blank for your current dir.\n";
+    print "Enter the path to the parent folder where you would like to "
+        . "install ElasticSearch.\n";
 
-    my $dir = Module::Build->prompt( "Install path:", undef );
+    $dir = Module::Build->prompt( "Install path:", $dir);
 
     my $temp_install;
     if ( defined $dir ) {
