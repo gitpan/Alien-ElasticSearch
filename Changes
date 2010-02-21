@@ -1,5 +1,8 @@
 Revision history for Alien-ElasticSearch
 
+0.04    2010-02-21
+        Fixed a version number
+
 0.03    2010-02-21
         Reorganised the build process so that it happens in Build.PL
         Otherwise, it tried to install twice, one for 'build' and once
