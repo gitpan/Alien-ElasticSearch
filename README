@@ -1,0 +1,79 @@
+NAME
+
+    Alien::ElasticSearch - Downloads, builds and installs ElasticSearch from
+    github
+
+VERSION  0.01
+
+SYNOPSIS
+        $install_dir = Alien::ElasticSearch->install_from_git($parent_dir);
+
+        $install_dir = Alien::ElasticSearch->install_dir();
+
+        $install_dir = Alien::ElasticSearch->update_from_git();
+
+DESCRIPTION
+
+    This module handles downloading ElasticSearch from github, building, and
+    installing it.
+
+    It then writes a config file to remember where it was installed.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build         # you will be asked to enter an installation path
+    ./Build test
+    ./Build install
+
+REQUIREMENTS
+    *   git (needs to be in your PATH)
+    *   Java version 6 or above
+
+SEE ALSO
+    ElasticSearch
+
+AUTHOR
+    Clinton Gormley, "<drtech at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-alien-elasticsearch
+    at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Alien-ElasticSearch>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Alien::ElasticSearch
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Alien-ElasticSearch>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Alien-ElasticSearch>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Alien-ElasticSearch>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Alien-ElasticSearch/>
+
+LICENSE AND COPYRIGHT
+    Copyright 2010 Clinton Gormley.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+
