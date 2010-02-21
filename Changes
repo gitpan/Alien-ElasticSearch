@@ -1,5 +1,8 @@
 Revision history for Alien-ElasticSearch
 
+0.05    2010-02-21
+        install_dir() wasn't saving the config after updating it
+
 0.04    2010-02-21
         Fixed a version number
 

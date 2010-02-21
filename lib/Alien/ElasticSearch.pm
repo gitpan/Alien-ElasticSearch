@@ -11,11 +11,11 @@ Alien::ElasticSearch - Downloads, builds and installs ElasticSearch from github
 
 =head1 VERSION
 
-Version 0.01
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 our $GIT_URL = 'git://github.com/elasticsearch/elasticsearch.git';
 
 =head1 SYNOPSIS
@@ -49,7 +49,6 @@ L<ElasticSearch>
 
 =cut
 
-
 #===================================
 sub install_dir {
 #===================================
@@ -58,10 +57,11 @@ sub install_dir {
         or return undef;
     if (@_) {
         Alien::ElasticSearch::ConfigData->set_config( 'install_dir', shift );
+        Alien::ElasticSearch::ConfigData->write;
     }
     my $dir = Alien::ElasticSearch::ConfigData->config('install_dir');
-    return undef unless -d  $dir;
-    return $dir
+    return undef unless -d $dir;
+    return $dir;
 }
 
 #===================================
@@ -71,7 +71,9 @@ sub temp_install {
     eval { require Alien::ElasticSearch::ConfigData; 1 }
         or return undef;
     if (@_) {
-        Alien::ElasticSearch::ConfigData->set_feature( 'temp_install', shift );
+        Alien::ElasticSearch::ConfigData->set_feature( 'temp_install',
+                                                       shift );
+        Alien::ElasticSearch::ConfigData->write;
     }
     return Alien::ElasticSearch::ConfigData->temp_install('temp_install');
 }
@@ -79,11 +81,12 @@ sub temp_install {
 #===================================
 sub update_from_git {
 #===================================
-    my $class      = shift;
-    my $install_dir = $class->install_dir or die "ElasticSearch not installed yet";
+    my $class       = shift;
+    my $install_dir = $class->install_dir
+        or die "ElasticSearch not installed yet";
     my @parts = splitdir($install_dir);
     pop @parts;
-    $class->install_from_git(catpath(@parts));
+    $class->install_from_git( catpath(@parts) );
 }
 
 #===================================
@@ -156,7 +159,6 @@ sub check_for_java {
         . 'or add it to your $JAVA_HOME.' . "\n";
     exit(0);
 }
-
 
 #===================================
 sub _build {
