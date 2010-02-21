@@ -3,7 +3,7 @@ NAME
     Alien::ElasticSearch - Downloads, builds and installs ElasticSearch from
     github
 
-VERSION  0.02
+VERSION  0.03
 
 SYNOPSIS
         $install_dir = Alien::ElasticSearch->install_from_git($parent_dir);
