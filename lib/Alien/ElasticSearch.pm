@@ -11,11 +11,11 @@ Alien::ElasticSearch - Downloads, builds and installs ElasticSearch from github
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 our $GIT_URL = 'git://github.com/elasticsearch/elasticsearch.git';
 
 =head1 SYNOPSIS
@@ -170,7 +170,7 @@ sub _build {
     $gradlew = catfile( $dir, $gradlew );
 
     print "\nBuilding ElasticSearch\n";
-    system( $gradlew, '-p', $dir, 'clean', 'devRelease' ) == 0
+    system( $gradlew, '-p', $dir ) == 0
         or die "Problem building ElasticSearch";
 
     my ($archive)

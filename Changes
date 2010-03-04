@@ -1,5 +1,8 @@
 Revision history for Alien-ElasticSearch
 
+0.06    2010-03-04
+        In gradle build process, removed 'clean devRelease'
+
 0.05    2010-02-21
         install_dir() wasn't saving the config after updating it
 
