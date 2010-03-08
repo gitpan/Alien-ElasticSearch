@@ -3,7 +3,7 @@ package Alien::ElasticSearch;
 use warnings;
 use strict;
 use File::Temp();
-use File::Spec::Functions qw(catfile splitdir rel2abs catdir devnull);
+use File::Spec::Functions qw(catfile catpath splitdir rel2abs catdir devnull);
 
 =head1 NAME
 
@@ -11,11 +11,11 @@ Alien::ElasticSearch - Downloads, builds and installs ElasticSearch from github
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 our $GIT_URL = 'git://github.com/elasticsearch/elasticsearch.git';
 
 =head1 SYNOPSIS

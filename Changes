@@ -1,5 +1,8 @@
 Revision history for Alien-ElasticSearch
 
+0.07    2010-03-08
+        Fixed update_from_git - was missing catpath
+
 0.06    2010-03-04
         In gradle build process, removed 'clean devRelease'
 
