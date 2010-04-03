@@ -1,34 +1,37 @@
 NAME
-
     Alien::ElasticSearch - Downloads, builds and installs ElasticSearch from
     github
 
-SYNOPSIS
-        $install_dir = Alien::ElasticSearch->install_from_git($parent_dir);
+VERSION
+    Version 0.08
 
+SYNOPSIS
+        # install latest version from Git to $install_dir
+        $install_dir = Alien::ElasticSearch->install($install_dir);
+
+        # upgrade existing installation
+        $install_dir = Alien::ElasticSearch->update();
+
+        # get current install dir
         $install_dir = Alien::ElasticSearch->install_dir();
 
-        $install_dir = Alien::ElasticSearch->update_from_git();
+        # set install dir
+        $install_dir = Alien::ElasticSearch->install_dir($install_dir);
 
 DESCRIPTION
-
     This module handles downloading ElasticSearch from github, building, and
     installing it.
 
     It then writes a config file to remember where it was installed.
 
-INSTALLATION
+    It also adds a script called "install_elasticsearch.pl" into your perl
+    bin directory, which can be called as follows:
 
-To install this module, run the following commands:
-
-    perl Build.PL
-    ./Build         # you will be asked to enter an installation path
-    ./Build test
-    ./Build install
+        install_elasticsearch.pl           # upgrade existing installation
+        install_elasticsearch.pl /path     # install to /path
 
 REQUIREMENTS
-    *   git (needs to be in your PATH)
-    *   Java version 6 or above
+    * Java version 6 or above
 
 SEE ALSO
     ElasticSearch
@@ -50,20 +53,16 @@ SUPPORT
 
     You can also look for information at:
 
-    *   RT: CPAN's request tracker
-
+    * RT: CPAN's request tracker
         <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Alien-ElasticSearch>
 
-    *   AnnoCPAN: Annotated CPAN documentation
-
+    * AnnoCPAN: Annotated CPAN documentation
         <http://annocpan.org/dist/Alien-ElasticSearch>
 
-    *   CPAN Ratings
-
+    * CPAN Ratings
         <http://cpanratings.perl.org/d/Alien-ElasticSearch>
 
-    *   Search CPAN
-
+    * Search CPAN
         <http://search.cpan.org/dist/Alien-ElasticSearch/>
 
 LICENSE AND COPYRIGHT

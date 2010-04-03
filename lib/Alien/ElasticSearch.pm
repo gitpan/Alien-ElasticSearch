@@ -11,20 +11,28 @@ Alien::ElasticSearch - Downloads, builds and installs ElasticSearch from github
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
-our $GIT_URL = 'git://github.com/elasticsearch/elasticsearch.git';
+our $VERSION = '0.08';
+our $MASTER_URL
+    = 'http://github.com/elasticsearch/elasticsearch/zipball/master';
 
 =head1 SYNOPSIS
 
-    $install_dir = Alien::ElasticSearch->install_from_git($parent_dir);
+    # install latest version from Git to $install_dir
+    $install_dir = Alien::ElasticSearch->install($install_dir);
 
+    # upgrade existing installation
+    $install_dir = Alien::ElasticSearch->update();
+
+    # get current install dir
     $install_dir = Alien::ElasticSearch->install_dir();
 
-    $install_dir = Alien::ElasticSearch->update_from_git();
+    # set install dir
+    $install_dir = Alien::ElasticSearch->install_dir($install_dir);
+
 
 =head1 DESCRIPTION
 
@@ -33,11 +41,15 @@ and installing it.
 
 It then writes a config file to remember where it was installed.
 
+It also adds a script called C<install_elasticsearch.pl> into your perl bin
+directory, which can be called as follows:
+
+    install_elasticsearch.pl           # upgrade existing installation
+    install_elasticsearch.pl /path     # install to /path
+
 =head1 REQUIREMENTS
 
 =over
-
-=item  * git (needs to be in your PATH)
 
 =item  * Java version 6 or above
 
@@ -60,75 +72,115 @@ sub install_dir {
         Alien::ElasticSearch::ConfigData->write;
     }
     my $dir = Alien::ElasticSearch::ConfigData->config('install_dir');
-    return undef unless -d $dir;
+    return undef unless $dir && -d $dir;
     return $dir;
 }
 
 #===================================
-sub temp_install {
-#===================================
-    my $self = shift;
-    eval { require Alien::ElasticSearch::ConfigData; 1 }
-        or return undef;
-    if (@_) {
-        Alien::ElasticSearch::ConfigData->set_feature( 'temp_install',
-                                                       shift );
-        Alien::ElasticSearch::ConfigData->write;
-    }
-    return Alien::ElasticSearch::ConfigData->temp_install('temp_install');
-}
-
-#===================================
-sub update_from_git {
-#===================================
-    my $class       = shift;
-    my $install_dir = $class->install_dir
-        or die "ElasticSearch not installed yet";
-    my @parts = splitdir($install_dir);
-    pop @parts;
-    $class->install_from_git( catpath(@parts) );
-}
-
-#===================================
-sub install_from_git {
-#===================================
-    my $class      = shift;
-    my $dest_dir   = shift or die "No installation path specified";
-    my $source_dir = $class->_download_with_git;
-    my $archive    = $class->_build( $source_dir->dirname );
-    return $class->_install( $archive, $dest_dir );
-
-}
-
-#===================================
-sub _download_with_git {
+sub install {
 #===================================
     my $class = shift;
-    $class->check_for_git;
-    my $git_version = `git --version`;
-    die "Can't find git in your PATH. "
-        . 'You either need to install it'
-        . 'or add it to your $PATH.'
-        unless $git_version && $git_version =~ /git/;
+    my $dest_dir = shift or die "No installation path specified";
 
-    my $dir = File::Temp->newdir();
-    print "\nDownloading latest version of ElasticSearch from: $GIT_URL\n ";
-    system( 'git', 'clone', $GIT_URL, $dir->dirname ) == 0
-        or die "Couldn't download source";
-    return $dir;
+    $class->check_for_java;
+
+    my $temp_dir = File::Temp->newdir();
+
+    my $source_dir = $class->_download( $temp_dir->dirname, $MASTER_URL );
+    my $archive = $class->_build($source_dir);
+    return $class->_install( $archive, $dest_dir );
 }
 
 #===================================
-sub check_for_git {
+sub upgrade {
 #===================================
-    my $class       = shift;
-    my $git_version = `git --version`;
-    return if $git_version && $git_version =~ /git/;
+    my $class    = shift;
+    my $dest_dir = $class->install_dir
+        or die "Can't update ElasticSearch - not installed";
+    $class->install($dest_dir);
+}
 
-    print "Can't find git in your PATH. "
-        . 'You either need to install it'
-        . 'or add it to your $PATH.' . "\n";
-    exit(0);
+#===================================
+sub _download {
+#===================================
+    my $class = shift;
+    my $dir   = shift;
+    my $uri   = shift;
+    require File::Fetch;
+    require Archive::Extract;
+
+    my $ff = File::Fetch->new( uri => $uri );
+    print "\nDownloading ElasticSearch from: $uri to $dir\n ";
+    my $archive = $ff->fetch( to => $dir ) or die $ff->error();
+
+    my $ae = Archive::Extract->new( archive => $archive, type => 'zip' );
+    $ae->extract( to => $dir ) or die $ae->error;
+
+    return $ae->extract_path;
+}
+
+#===================================
+sub _build {
+#===================================
+    my $class = shift;
+    my $dir   = shift;
+
+    my ( $archive, $error );
+
+    my $gradlew = $^O eq 'MSWin32' ? 'gradlew.bat' : 'gradlew';
+    $gradlew = catfile( $dir, $gradlew );
+
+    print "\nBuilding ElasticSearch\n";
+    system( $gradlew, '-p', $dir ) == 0
+        or die "Problem building ElasticSearch";
+
+    ($archive)
+        = glob(
+        catfile( $dir, 'build', 'distributions', 'elasticsearch*.zip' ) );
+
+    die "Couldn't find the compiled distribution file - not sure what failed"
+        unless $archive;
+
+    return rel2abs($archive);
+}
+
+#===================================
+sub _install {
+#===================================
+    my $class    = shift;
+    my $archive  = shift;
+    my $dest_dir = shift;
+
+    require File::Copy::Recursive;
+
+    my $temp_dir = File::Temp->newdir;
+
+    my $ae = Archive::Extract->new( archive => $archive );
+    $ae->extract( to => $temp_dir )
+        or die "Couldn't extract archive '$archive' to '$dest_dir': "
+        . $ae->error;
+    my $dir = $ae->extract_path;
+
+    if ( -e $dest_dir ) {
+        die "$dest_dir already exists but is not a directory"
+            unless -d _;
+
+        for my $file (qw(elasticsearch.yml logging.yml)) {
+            my $dest_file = catfile( $dest_dir, 'config', $file );
+            next unless -e $dest_file;
+            print "Config file $dest_file exists.\n"
+                . " -> Creating as $dest_file.orig\n";
+            my $source_file = catfile( $dir, 'config', $file );
+            rename $source_file, "$source_file.orig"
+                or die "Couldn't rename $source_file : $!";
+        }
+    }
+
+    File::Copy::Recursive::rcopy_glob( catfile( $dir, '*' ), $dest_dir )
+        or die "Couldn't install to $dest_dir : $!";
+
+    print "\nElasticSearch installed to $dest_dir\n";
+    return $class->install_dir($dest_dir);
 }
 
 #===================================
@@ -158,49 +210,6 @@ sub check_for_java {
         . ".\nYou either need to install it "
         . 'or add it to your $JAVA_HOME.' . "\n";
     exit(0);
-}
-
-#===================================
-sub _build {
-#===================================
-    my $class = shift;
-    my $dir   = shift;
-
-    my $gradlew = $^O eq 'MSWin32' ? 'gradlew.bat' : 'gradlew';
-    $gradlew = catfile( $dir, $gradlew );
-
-    print "\nBuilding ElasticSearch\n";
-    system( $gradlew, '-p', $dir ) == 0
-        or die "Problem building ElasticSearch";
-
-    my ($archive)
-        = glob( catfile( $dir, 'build', 'distributions', '*.zip' ) );
-    die "Couldn't find the compiled distribution file - not sure what failed"
-        unless $archive;
-
-    return rel2abs($archive);
-}
-
-#===================================
-sub _install {
-#===================================
-    my $class    = shift;
-    my $archive  = shift;
-    my $dest_dir = shift;
-
-    $class->check_for_java;
-
-    $dest_dir = catfile( rel2abs($dest_dir), '' );
-    my ($volume) = splitdir($dest_dir);
-    require Archive::Extract;
-    my $a = Archive::Extract->new( archive => $archive );
-    $a->extract( to => $dest_dir )
-        or die "Couldn't extract archive '$archive' to '$dest_dir': "
-        . $a->error;
-    my $install_dir = $a->extract_path;
-    print "\nElasticSearch installed to $install_dir\n";
-    $class->install_dir($install_dir);
-    return $install_dir;
 }
 
 =head1 AUTHOR

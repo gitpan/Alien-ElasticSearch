@@ -1,5 +1,14 @@
 Revision history for Alien-ElasticSearch
 
+0.08    2010-04-03
+        Much improved.
+        No longer requires git
+        Can install the module without installing ElasticSearch, which you
+        can do later
+        Added install_elasticsearch.pl script to make it easier to update
+        to the latest master from git
+        Doesn't overwrite existing config files
+
 0.07    2010-03-08
         Fixed update_from_git - was missing catpath
 

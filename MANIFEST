@@ -1,5 +1,7 @@
+bin/install_elasticsearch.pl
 Build.PL
 Changes
+inc/MY/Build.pm
 lib/Alien/ElasticSearch.pm
 Makefile.PL
 MANIFEST
