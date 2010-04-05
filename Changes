@@ -1,4 +1,7 @@
 Revision history for Alien-ElasticSearch
+0.09    2010-04-05
+        Added a workaround for a bug in File::Copy::Recursive which meant
+        that not all files were being copied the first time
 
 0.08    2010-04-03
         Much improved.

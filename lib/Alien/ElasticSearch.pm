@@ -11,11 +11,11 @@ Alien::ElasticSearch - Downloads, builds and installs ElasticSearch from github
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 our $MASTER_URL
     = 'http://github.com/elasticsearch/elasticsearch/zipball/master';
 
@@ -176,6 +176,11 @@ sub _install {
         }
     }
 
+    File::Copy::Recursive::rcopy_glob( catfile( $dir, '*' ), $dest_dir )
+        or die "Couldn't install to $dest_dir : $!";
+
+    # repeat the copy to overcome a bug in File::Copy::Recursive
+    # that results in some files not being copied the first time
     File::Copy::Recursive::rcopy_glob( catfile( $dir, '*' ), $dest_dir )
         or die "Couldn't install to $dest_dir : $!";
 
