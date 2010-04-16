@@ -1,4 +1,20 @@
 Revision history for Alien-ElasticSearch
+0.10    2010-04-16
+        Added version(), plugins(), user(), group()
+        Now you can specify a particular version or tag to install, eg
+
+          install_elasticsearch.pl          \
+            --dir /path                     \
+            --version 0.6.0                 \
+            --plugins attachments,groovy    \
+            --user elasticsearch            \
+            --group users
+
+        Also added a 'temp' option, which will do an installation, but
+        not store the installation details in the config.
+
+        Added some actual tests
+
 0.09    2010-04-05
         Added a workaround for a bug in File::Copy::Recursive which meant
         that not all files were being copied the first time

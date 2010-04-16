@@ -3,20 +3,39 @@ NAME
     github
 
 VERSION
-    Version 0.09
+    Version 0.10
 
 SYNOPSIS
         # install latest version from Git to $install_dir
-        $install_dir = Alien::ElasticSearch->install($install_dir);
+        $install_dir = Alien::ElasticSearch->install(
+            dir     => '/path/to/elasticsearch',
+            version => '0.6.0',           # released version
+          | tag     => 'master',          # or a git tag or sha1
+            plugins => ['attachments'],
+            user    => 'elasticsearch',   # unix/linux only
+            group   => 'users',           # unix/linux only
+            temp    => 1 | 0              # do installation, but don't store config
+        );
 
         # upgrade existing installation
-        $install_dir = Alien::ElasticSearch->update();
+        $install_dir = Alien::ElasticSearch->upgrade(
+            tag     => 'master'           # accepts same args as install()
+        );
 
-        # get current install dir
-        $install_dir = Alien::ElasticSearch->install_dir();
-
-        # set install dir
+        # get/set current install dir
         $install_dir = Alien::ElasticSearch->install_dir($install_dir);
+
+        # get/set current version
+        $version = Alien::ElasticSearch->version($version);
+
+        # get/set current plugins
+        $plugins = Alien::ElasticSearch->plugins(\@plugin_names);
+
+        # get/set current user
+        $user = Alien::ElasticSearch->user($user);
+
+        # get/set current group
+        $group = Alien::ElasticSearch->group($group);
 
 DESCRIPTION
     This module handles downloading ElasticSearch from github, building, and
@@ -27,8 +46,12 @@ DESCRIPTION
     It also adds a script called "install_elasticsearch.pl" into your perl
     bin directory, which can be called as follows:
 
-        install_elasticsearch.pl           # upgrade existing installation
-        install_elasticsearch.pl /path     # install to /path
+        install_elasticsearch.pl              # upgrade existing installation
+        install_elasticsearch.pl --dir /path  # install to /path
+
+    To see all available options, try:
+
+        install_elasticsearch.pl --help
 
 REQUIREMENTS
     * Java version 6 or above

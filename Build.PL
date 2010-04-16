@@ -18,17 +18,15 @@ my $builder = MY::Build->new(
     create_makefile_pl => 'small',
 );
 
-my $install_dir;
 eval {
     require Alien::ElasticSearch;
-    $install_dir = Alien::ElasticSearch->install_dir;
+    for (qw(install_dir version plugins user group)) {
+
+ $builder->config_data( $_, Alien::ElasticSearch->$_ )
+         if Alien::ElasticSearch->can($_) ;
+    }
 };
 
-$builder->config_data( install_dir => $install_dir );
-
-unshift @INC, 'lib';
-require Alien::ElasticSearch;
-Alien::ElasticSearch->check_for_java();
-
 $builder->create_build_script();
+
 
